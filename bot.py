@@ -101,7 +101,8 @@ class Bot:
 
             followers = self.driver.find_elements_by_class_name("-nal3")
             followers[2].click()
-            time.sleep(2)
+            # time.sleep(2)
+            time.sleep(5) # coba ganti time sleep
             initialise_vars = 'elem = document.getElementsByClassName("isgrP")[0]; followers = parseInt(document.getElementsByClassName("g47SY")[1].innerText); times = parseInt(followers * 0.14); followersInView1 = document.getElementsByClassName("FPmhX").length'
             initial_scroll = 'elem.scrollTop += 500'
             next_scroll = 'elem.scrollTop += 2000'
@@ -115,7 +116,8 @@ class Bot:
                 self.driver.execute_script(initialise_vars)
                 # self.driver.execute_script(scroll_followers)
                 self.driver.execute_script(initial_scroll)
-                time.sleep(random.randint(2, 5))
+                # time.sleep(random.randint(2, 5))
+                time.sleep(random.randint(5, 10)) # coba ganti time sleep
 
                 next = True
                 follow_set = set()

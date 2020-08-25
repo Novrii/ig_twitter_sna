@@ -1,5 +1,6 @@
 from bot import Bot
 import argparse
+from secrets import username_, password_
 
 
 def generate_my_followers_txt(my_followers):
@@ -9,8 +10,8 @@ def generate_my_followers_txt(my_followers):
 
 
 def get_my_followers():
-    username = 'novriikurniawan'
-    password = 'gang duku'
+    username = username_
+    password = password_
     b = Bot()
 
     b.setUp()

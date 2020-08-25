@@ -2,3 +2,5 @@
 /ua.csv
 /venv
 /__pycache__
+secrets.py
+debug.log

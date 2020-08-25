@@ -1,6 +1,7 @@
 from bot import Bot
 import argparse
 import os.path
+from secrets import username_, password_
 
 
 def generate_txt(relations_file, my_followers_arr, username):
@@ -17,7 +18,7 @@ def get_start_profile():
 
 def get_my_followers_from_txt():
     my_followers_arr = []
-    with open('my_followers.txt') as f:
+    with open('my_followers_copy.txt') as f:
         for line in f:
             my_followers_arr.append(line.rstrip('\n'))
     return my_followers_arr
@@ -25,8 +26,8 @@ def get_my_followers_from_txt():
 
 def get_relations():
     relations_file = 'relations.txt'
-    username = 'novriikurniawan'
-    password = 'gang duku'
+    username = username_
+    password = password_
     b = Bot()
 
     b.setUp()
