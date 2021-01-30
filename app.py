@@ -224,8 +224,12 @@ def cari():
                     print(f"[shortcode] {shortcode}")
                     url = "https://www.instagram.com/p/{0}/?__a=1".format(shortcode)
                     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
-                    r = requests.get(url, headers=headers)
 
+                    try:
+                        r = requests.get(url, headers=headers)
+                    except requests.exceptions.ConnectionError:
+                        print("Connectioin Refused")
+                    
                     try:
                         data = json.loads(r.text)
                         try:
@@ -307,14 +311,17 @@ def cari():
                                 'until': tahun[xi]+'-'+bulan[yi+1]+'-01',
                             }
 
-                            for tweet in BlueBird().search(query):
-                                print(tweet)
-                                teks.append({
-                                    "created_at" : tweet['created_at'],
-                                    "user_id" : tweet['user_id_str'],
-                                    "text" : tweet['full_text']
-                                })
-                                tw_user_id.append(tweet['user_id_str'])
+                            try:
+                                for tweet in BlueBird().search(query):
+                                    print(tweet)
+                                    teks.append({
+                                        "created_at" : tweet['created_at'],
+                                        "user_id" : tweet['user_id_str'], #untuk mengambil id twitter
+                                        "text" : tweet['full_text']
+                                    })
+                                    tw_user_id.append(tweet['user_id_str'])
+                            except requests.exceptions.ConnectionError:
+                                print("Connectioin Refused")
                         # else:
                         #     if xi+1 < len(tahun):
                         #         print(bulan[yi],tahun[xi],bulan[yi-1],tahun[xi+1])
@@ -359,7 +366,11 @@ def cari():
                             # mencari relasi setiap akun
                             # print(tw_user_id[idx_usr],tw_user_id[jdx_usr])
                             # print(idx_usr, jdx_usr)
-                            relasi = api.show_friendship(source_id = tw_user_id[idx_usr], target_id = tw_user_id[jdx_usr])
+                            try:
+                                relasi = api.show_friendship(source_id = tw_user_id[idx_usr], target_id = tw_user_id[jdx_usr]) # cek relasi pakai tweepy
+                            except tweepy.error.TweepError:
+                                print("Connectioin Refused") # jaringan bermasalah
+                            
                             if relasi[0].followed_by == True:
                                 print(relasi[0].screen_name, relasi[1].screen_name)
                                 relations.append({
