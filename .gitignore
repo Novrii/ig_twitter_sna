@@ -4,3 +4,6 @@
 /__pycache__
 secrets.py
 debug.log
+.vscode
+data
+testing

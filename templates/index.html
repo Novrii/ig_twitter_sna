@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="../static/style.css" />
+    <title>Instagram Hashtag | Search</title>
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.2.min.js" integrity="sha384-ufR9RFnRs6lniiaFvtJziE0YeidtAgBRH6ux2oUItHw5WTvE1zuk9uzhUU/FJXDp" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script type="text/javascript">
+        Bokeh.set_log_level("info");
+    </script>
+</head>
+<body>
+    
+    <a href="/logout" class="btn-standar" style="width: fit-content; position: fixed; right: 0;"> <i class="fa fa-sign-out"></i></a>
+    <div class="container">
+
+
+        {% if status == 'home' %}
+        <img src="../static/sna2.gif" alt="social network analysis" class="logo" />
+        <h2 style="text-align: center;">Social Network Analysis <br><small>Instagram & Twitter</small></h2>
+
+            <form action="/cari" method="POST" style="max-width: 500px; margin: 0 auto;">
+                <div class="form-group">
+                    <h3>
+                        Hashtag (#)
+                    </h3>
+                    <input
+                        type="text"
+                        name="hashtag"
+                        class="input"
+                    />
+                </div>
+                <input type="submit" value="Cari" class="btn-standar" style="background-color:#025469; color: #fff; font-weight: bold; font-size: medium;" />
+            </form>
+    
+            <h2 style="text-align: center; color: #333;">Riwayat</h2>
+    
+            {% if riwayat %}
+                {% for x in riwayat %}
+                <div class="form-group" style="max-width: 500px; margin: 0 auto;">
+                    <form action="/cari" method="POST" style="width: 437px; display: inline-block;">
+                        <button 
+                        type="submit"
+                        name="hashtag"
+                        value="{{ x.split('_')[1] }}"
+                        class="btn-riwayat" style="text-align: left; background-color: #025469;  color: #fff; font-weight: bold;">#{{ x.split('_')[1] }}
+                        
+                        </button>
+                        
+                    </form>
+                    <form id="delForm{{x}}" action="/delete_riwayat" method="POST" style="width: fit-content; display: inline-block; ">
+                        <input type="hidden" name="del_tag" value="{{ x.split('_')[1] }}">
+                        <button 
+                            type="submit"
+                            class="btn-riwayat" style="text-align: left; "
+                            onclick="archiveFunction('{{x}}')"><i class="fa fa-trash"></i>
+                            
+                        </button>
+                        
+                    </form>
+
+                </div>
+                {% endfor %}
+            {% endif %}
+
+        {% elif status == 'proses' %}
+
+            <a href="/cari" class="btn-standar" style="text-decoration: none; background-color:#025469;"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i> Kembali</a>
+            
+            <p>{{menit}} menit {{ detik }} detik</p>
+            <p><b>Instagram : </b> {{ raw_data|length }} posts | {{ profil_ig|length }} profil | {{ n_nodes }} nodes | {{ n_edges }} edges</p>
+            <p><b>Twitter : </b>{{ data_tw|length }} tweets | {{ profil_tw|length }} profil | {{ n_nodes_tw }} nodes | {{ n_edges_tw }} edges</p>
+            {% set item1, item2 = tag.split('_') %}
+            <h1 style="float: left;">{{ item2 }}</h1>
+            <!-- <form action="/proses" method="POST">
+                <div class="form-group" style="width: fit-content; float: right;">
+                    <button 
+                    type="submit"
+                    name="hashtag"
+                    value="{{ item1 }}"
+                    class="btn-riwayat"
+                    style="margin-top: 0;"><i class="fa fa-refresh"></i> update</button>
+                </div>
+            </form> -->
+
+            <div style="content: none; clear: both;"></div>
+
+            <button class="tablink" onclick="openPage('Home', this, 'rgb(28 156 234)')" id="defaultOpen">Twitter</button>
+            <button class="tablink" onclick="openPage('News', this, 'rgb(233, 38, 71)')" >Instagram</button>
+
+            <div id="Home" class="tabcontent">
+                
+                <h1 style="margin-top: 0;">
+                    Graph Twitter #{{ item1 }}
+                </h1>
+
+                <div style="margin: 0 auto; width: fit-content;">
+                    {{ tag_html_tw[0]['div'] | safe }}
+                </div>
+
+                <table id="customers" class="more_load1" >
+                    <tr>
+                        <th style="text-align: center;">No</th>
+                        <th style="width: 175px;">Degree <br>Centrality</th>
+                        <th style="width: 175px;">Closeness <br>Centrality</th>
+                        <th style="width: 175px;">Betweenness <br>Centrality</th>
+                        <th style="width: 175px;">Eigenvector <br>Centrality</th>
+                    </tr>
+                    {% for x in range(deg_cen_tw|length) %}
+                        <tr>
+                            <td>{{ x + 1 }}</td>
+                            <td style="width: 175px;">
+                                <a href="https://www.twitter.com/{{ deg_cen_tw[x].split()[0] | safe }}" target="_blank">
+                                    {{ deg_cen_tw[x] | safe }}
+                                </a>
+                            </td>
+                            <td style="width: 175px;">
+                                <a href="https://www.twitter.com/{{ clo_cen_tw[x].split()[0] | safe }}" target="_blank">
+                                    {{ clo_cen_tw[x] | safe }}
+                                </a>
+                            </td>
+                            <td style="width: 175px;">
+                                <a href="https://www.twitter.com/{{ bet_cen_tw[x].split()[0] | safe }}" target="_blank">
+                                    {{ bet_cen_tw[x] | safe }}
+                                </a>
+                            </td>
+                            <td style="width: 175px;">
+                                <a href="https://www.twitter.com/{{ clo_cen_tw[x].split()[0] | safe }}" target="_blank">
+                                    {{ clo_cen_tw[x] | safe }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+                <!-- Load More button -->
+                <a href="#" id="load_more1" class="btn-standar" style="text-align: center;">Load more</a>
+
+            </div>
+            
+            <div id="News" class="tabcontent" style="table-layout: fixed;">
+                <h1 style="margin-top: 0;">
+                    Graph Instagram #{{ item1 }}
+                </h1>
+
+                <div style="margin: 0 auto; width: fit-content;">
+                    {{ tag_html[0]['div'] | safe }}
+                </div>
+
+                <table id="customers" class="more_load" >
+                    <tr>
+                        <th style="text-align: center;">No</th>
+                        <th style="word-break: break-all;">Degree <br>Centrality</th>
+                        <th style="word-break: break-all;">Closeness <br>Centrality</th>
+                        <th style="word-break: break-all;">Betweenness <br>Centrality</th>
+                        <th style="word-break: break-all;">Eigenvector <br>Centrality</th>
+                    </tr>
+                    {% for x in range(deg_cen|length) %}
+                        <tr>
+                            <td>{{ x + 1 }}</td>
+                            <td style="word-break: break-all;">
+                                <a href="https://www.instagram.com/{{ deg_cen[x].split()[0] | safe }}/" target="_blank">
+                                    {{ deg_cen[x] | safe }}
+                                </a>
+                                {{deg_cen|length}}
+                            </td>
+                            <td style="word-break: break-all;">
+                                <a href="https://www.instagram.com/{{ clo_cen[x].split()[0] | safe }}/" target="_blank">
+                                    {{ clo_cen[x] | safe }}
+                                </a>
+                            </td>
+                            <td style="word-break: break-all;">
+                                <a href="https://www.instagram.com/{{ bet_cen[x].split()[0] | safe }}/" target="_blank">
+                                    {{ bet_cen[x] | safe }}
+                                </a>
+                            </td>
+                            <td style="word-break: break-all;">
+                                <a href="https://www.instagram.com/{{ clo_cen[x].split()[0] | safe }}/" target="_blank">
+                                    {{ clo_cen[x] | safe }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                
+                <a href="#" id="load_more" class="btn-standar" style="text-align: center;">Load more</a>
+            </div>
+
+            
+            
+            
+        {% endif %}
+
+    </div>
+
+    <script>
+        function archiveFunction(data) {
+            event.preventDefault(); // prevent form submit
+            // var form = event.target.form; // storing the form
+
+            Swal.fire({
+            title: 'Anda Yakin?',
+            text: "Hapus riwayat hashtag "+data.split('_')[1]+"?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Hapus!'
+            }).then((result) => {
+            if (result.value) {
+                // Swal.fire(
+                // 'Deleted!',
+                // 'Your file has been deleted.',
+                // 'success'
+                // )
+                document.getElementById("delForm"+data).submit();
+            }
+            })
+        }
+    </script>
+
+    <script>
+        $('table.more_load tr:lt(31)').addClass('active'); // tabel hasil ig
+        $('table.more_load1 tr:lt(31)').addClass('active'); // tabel hasil tw
+
+        $('a#load_more').on('click', function(e) {
+            e.preventDefault();  
+            var $rows = $('table.more_load tr');
+            var lastActiveIndex = $rows.filter('.active:last').index();
+            $rows.filter(':lt(' + (lastActiveIndex + 10) + ')').addClass('active');
+        });
+        $('a#load_more1').on('click', function(e) {
+            e.preventDefault();  
+            var $rows = $('table.more_load1 tr');
+            var lastActiveIndex = $rows.filter('.active:last').index();
+            $rows.filter(':lt(' + (lastActiveIndex + 5) + ')').addClass('active');
+        });
+    </script>
+
+    <script>
+        function openPage(pageName,elmnt,color) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].style.backgroundColor = "";
+            }
+            document.getElementById(pageName).style.display = "block";
+            elmnt.style.backgroundColor = color;
+        }
+
+    // Get the element with id="defaultOpen" and click on it
+    document.getElementById("defaultOpen").click();
+    </script>
+
+    {% if tag_html %}
+        {{ tag_html[0]['script'] | safe }}
+    {% endif %}
+    {% if tag_html_tw %}
+        {{ tag_html_tw[0]['script'] | safe }}
+    {% endif %}
+    
+</body>
+</html>

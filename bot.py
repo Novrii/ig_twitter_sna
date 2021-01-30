@@ -9,6 +9,7 @@ import time
 import re
 import collections
 import sys
+import json
 
 class Bot:
     def setUp(self):
@@ -85,9 +86,11 @@ class Bot:
 
             return list(my_followers_set)
 
-    def get_followers(self, my_followers_arr, start_profile, relations_file):
+    # def get_followers(self, my_followers_arr, start_profile, relations_file):
+    def get_followers(self, my_followers_arr, start_profile, dir_riwayat):
         n_my_followers = len(my_followers_arr)
         count_my_followers = start_profile - 1
+        # user_relations = []
 
         for current_profile in my_followers_arr[start_profile - 1 : -1] + [my_followers_arr[-1]]:
             print("Start scraping " + current_profile)
@@ -101,8 +104,8 @@ class Bot:
 
             followers = self.driver.find_elements_by_class_name("-nal3")
             followers[2].click()
-            # time.sleep(2)
-            time.sleep(5) # coba ganti time sleep
+            time.sleep(2) # based
+            # time.sleep(5) # coba ganti time sleep
             initialise_vars = 'elem = document.getElementsByClassName("isgrP")[0]; followers = parseInt(document.getElementsByClassName("g47SY")[1].innerText); times = parseInt(followers * 0.14); followersInView1 = document.getElementsByClassName("FPmhX").length'
             initial_scroll = 'elem.scrollTop += 500'
             next_scroll = 'elem.scrollTop += 2000'
@@ -116,8 +119,8 @@ class Bot:
                 self.driver.execute_script(initialise_vars)
                 # self.driver.execute_script(scroll_followers)
                 self.driver.execute_script(initial_scroll)
-                # time.sleep(random.randint(2, 5))
-                time.sleep(random.randint(5, 10)) # coba ganti time sleep
+                time.sleep(random.randint(2, 5)) # based
+                # time.sleep(random.randint(5, 10)) # coba ganti time sleep
 
                 next = True
                 follow_set = set()
@@ -127,9 +130,11 @@ class Bot:
                 n_li = 1
                 while next:
                     print(str(count_my_followers) + "/" + str(n_my_followers) + " " + str(n_li) + "/" + str(nr_following))
-                    time.sleep(random.randint(7, 12) / 10.0)
+                    # time.sleep(random.randint(7, 12) / 10.0)
+                    time.sleep(random.randint(33, 42) / 10.0) # coba ganti time sleep
                     self.driver.execute_script(next_scroll)
-                    time.sleep(random.randint(7, 12) / 10.0)
+                    # time.sleep(random.randint(7, 12) / 10.0)
+                    time.sleep(random.randint(33, 42) / 10.0) # coba ganti time sleep
                     if not (n_li < nr_following - 11):
                         next = False
 
@@ -144,7 +149,7 @@ class Bot:
                             print("Instagram keeps on blocking your request. Terminating program. Start it again later.")
                             sys.exit()
                         time.sleep(7)
-                        self.get_followers(my_followers_arr, count_my_followers, relations_file)
+                        self.get_followers(my_followers_arr, count_my_followers, dir_riwayat)
 
                 self.times_restarted = 0
 
@@ -154,11 +159,20 @@ class Bot:
                     if profile in my_followers_arr:
                         follow_set.add((current_profile, profile))
 
-                with open(relations_file, "a") as outfile:
+                # user_relations = []
+                with open(dir_riwayat+"/relations.txt", "a") as outfile: # save relation txt
                     for relation in follow_set:
                         outfile.write(relation[0] + " " + relation[1] + "\n")
-
+                        # user_relations.append({
+                        #     "node1" : (relation[0][:-1]).replace("https://www.instagram.com/",""),
+                        #     "node2" : (relation[1][:-1]).replace("https://www.instagram.com/","")
+                        # })
+                        print(relation[0], relation[1])
                 print("This person follows " + str(len(follow_set)) + " of your connections. \n")
+            # with open(dir_riwayat+"/relations.json", "w") as outfile: # save relation json 
+            #     json.dump(user_relations, outfile)
+            #     print("[INFO] Saved relations.json")
+
 
         sys.exit()
 
